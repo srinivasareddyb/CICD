@@ -20,9 +20,10 @@
       "service": "html5-apps-repo-rt",
       "authenticationType": "xsuaa"
     },{
-        "source":"^(.*)$",
+        "source":"^/V2/(.*)$",
         "authenticationType" : "none",
-        "destination" : "NorthREST"
+        "destination" : "NorthREST",
+        "csrfProtection": false
     }
   ]
 }
