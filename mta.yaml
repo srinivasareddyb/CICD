@@ -1,0 +1,94 @@
+_schema-version: "3.2"
+ID: cicdapp
+description: A Fiori application.
+version: 0.0.1
+modules:
+- name: cicdapp-dest-content
+  type: com.sap.application.content
+  requires:
+  - name: cicdapp-dest-srv
+    parameters:
+      content-target: true
+  - name: cicdapp-repo-host
+    parameters:
+      service-key:
+        name: cicdapp-repo-host-key
+  - name: cicdapp-uaa
+    parameters:
+      service-key:
+        name: cicdapp-uaa-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: cicdapp_repo_host
+          ServiceInstanceName: cicdapp-html5-srv
+          ServiceKeyName: cicdapp-repo-host-key
+          sap.cloud.service: cicdapp
+        - Authentication: OAuth2UserTokenExchange
+          Name: cicdapp_uaa
+          ServiceInstanceName: cicdapp-xsuaa-srv
+          ServiceKeyName: cicdapp-uaa-key
+          sap.cloud.service: cicdapp
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: cicdapp-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: cicdapp-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - cicdapp.zip
+      name: cicdapp
+      target-path: resources/
+- name: cicdapp
+  type: html5
+  path: .
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: cicdapp-dest-srv
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: cicdapp-dest-srv
+    service-plan: lite
+- name: cicdapp-uaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: cicdapp-xsuaa-srv
+    service-plan: application
+- name: cicdapp-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: cicdapp-html5-srv
+    service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
