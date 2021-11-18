@@ -12,7 +12,7 @@ sap.ui.define([], function () {
 		numberUnit : function (sValue) {
 			if (!sValue) {
 				return "";
-			}
+            }
 			return parseFloat(sValue).toFixed(2);
 		}
 

@@ -74,7 +74,7 @@ resources:
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
-    service-name: cicdapp-dest-srv
+    service-name: cf
     service-plan: lite
 - name: cicdapp-uaa
   type: org.cloudfoundry.managed-service
